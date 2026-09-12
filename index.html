@@ -1,115 +1,76 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#09090b">
-<title>Biometric Test</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Biometric Lock Demo</title>
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:20px;display:grid;place-items:center;background:#09090b;color:#f5f5f5;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.card{width:min(440px,100%);padding:28px 22px;border:1px solid #27272a;border-radius:28px;background:#141416;box-shadow:0 24px 80px #0009;text-align:center}.logo{width:78px;height:78px;margin:4px auto 18px;display:grid;place-items:center;border-radius:24px;background:#202024;font-size:38px}.eyebrow{margin:0 0 7px;font-size:11px;letter-spacing:2px;color:#888}.title{margin:0;font-size:30px}.sub{margin:10px auto 20px;max-width:370px;color:#a1a1aa;line-height:1.55}.status{min-height:45px;margin:14px 0;padding:12px 14px;border-radius:14px;background:#1d1d21;color:#b8b8c0;font-size:14px;line-height:1.4}.status.ok{color:#9af0b1;background:#132119}.status.bad{color:#ffabab;background:#241719}button{width:100%;margin-top:10px;padding:15px 16px;border:0;border-radius:15px;font:700 15px inherit;cursor:pointer;background:#f5f5f5;color:#111}button.secondary{background:#28282d;color:#fff}button.ghost{background:transparent;color:#999;font-weight:600}button:disabled{opacity:.45;cursor:not-allowed}.hidden{display:none!important}.secret{margin-top:18px;padding:20px;border-radius:20px;background:#19251d;border:1px solid #294b34}.check{font-size:38px}.secret h2{margin:8px 0 4px}.secret p{margin:0;color:#a9c2af;font-size:14px}details{margin-top:18px;text-align:left;color:#999;font-size:13px}summary{cursor:pointer;color:#bbb;font-weight:600}details p{line-height:1.55}.note{margin:18px 0 0;color:#666;font-size:11px;line-height:1.5}
+*{box-sizing:border-box}body{margin:0;min-height:100svh;padding:18px;display:grid;place-items:center;background:radial-gradient(circle at 50% 0,#25252b 0,#0b0b0d 42%,#060607 100%);color:#f5f5f7;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.app{width:min(430px,100%)}.card{padding:28px 20px;border:1px solid #29292e;border-radius:30px;background:rgba(20,20,23,.94);box-shadow:0 25px 80px #000b;text-align:center;backdrop-filter:blur(18px)}.icon{width:78px;height:78px;margin:0 auto 18px;display:grid;place-items:center;border-radius:25px;background:#25252a;font-size:37px}.success{width:70px;height:70px;margin:0 auto 18px;display:grid;place-items:center;border-radius:50%;background:#183321;color:#9df0b5;font-size:34px}.eyebrow{margin:0 0 8px;font-size:11px;letter-spacing:2.2px;color:#85858d;font-weight:700}.card h1,.card h2{margin:0;font-size:30px;letter-spacing:-.8px}.card h2{font-size:26px}.sub{margin:11px auto 22px;max-width:360px;color:#a5a5ad;line-height:1.55;font-size:14px}.primary,.secondary,.link{width:100%;min-height:52px;margin-top:10px;border:0;border-radius:16px;padding:14px 16px;font:700 15px inherit;cursor:pointer;touch-action:manipulation}.primary{background:#f4f4f5;color:#111}.secondary{background:#29292f;color:#fff}.link{background:transparent;color:#a7a7af;font-weight:650}.primary:active,.secondary:active{transform:scale(.985)}button:disabled{opacity:.45;cursor:not-allowed}.message{min-height:22px;margin:16px 2px 0;padding:0 4px;color:#aaa;font-size:13px;line-height:1.45}.message.ok{color:#9deeb2}.message.bad{color:#ffaaa9}.pinPanel{margin-top:18px;padding-top:18px;border-top:1px solid #29292e;text-align:left}.pinPanel label{display:block;margin-bottom:8px;color:#aaa;font-size:13px}.pinPanel input{width:100%;height:54px;border:1px solid #34343a;border-radius:15px;background:#0e0e11;color:#fff;text-align:center;font-size:22px;letter-spacing:7px;outline:none}.pinPanel input:focus{border-color:#777}.note{margin:18px 0 0;color:#68686f;font-size:11px;line-height:1.5}.secretBox{margin:20px 0;padding:20px;border:1px solid #2c4a35;border-radius:20px;background:#152119;color:#b4cbb9}.hidden{display:none!important}.setup{text-align:center}.tiny{font-size:12px;color:#777;margin-top:12px}@media(max-height:650px){.card{padding:22px 18px}.icon{width:64px;height:64px;font-size:30px;margin-bottom:12px}}
 </style>
 </head>
 <body>
-<main class="card">
-  <div class="logo">🔐</div>
-  <p class="eyebrow">WEBAUTHN TEST LAB</p>
-  <h1 class="title">Biometric Unlock</h1>
-  <p class="sub">A simple demo for testing your phone's fingerprint, face unlock, or secure device authentication in a web browser.</p>
-
-  <div id="status" class="status">Checking your browser…</div>
-
-  <section id="registerBox">
-    <button id="registerBtn">Set Up Biometric</button>
-  </section>
-
-  <section id="unlockBox" class="hidden">
-    <button id="unlockBtn">👆 Unlock with Fingerprint / Face</button>
-    <button id="resetBtn" class="secondary">Reset & Register Again</button>
-  </section>
-
-  <section id="secret" class="secret hidden">
-    <div class="check">✓</div>
-    <h2>Successfully Unlocked</h2>
-    <p>Your device completed the WebAuthn verification.</p>
-  </section>
-
-  <details>
-    <summary>What is happening?</summary>
-    <p>WebAuthn creates a cryptographic credential. Your phone's operating system performs the fingerprint, face, or screen-lock verification. The website does not receive your biometric data.</p>
-  </details>
-  <p class="note">Demo purpose only. This client-side test does not implement a server-side authentication system and should not be used to protect real private data.</p>
+<main class="app">
+<section class="card" id="lockCard">
+<div class="icon">🔐</div>
+<p class="eyebrow">WEBAUTHN DEMO</p>
+<h1>Private Space</h1>
+<p class="sub" id="statusText">Checking this device…</p>
+<button class="primary" id="unlockBtn">🔓 Unlock with Face / Fingerprint</button>
+<button class="secondary" id="pinBtn">Use PIN instead</button>
+<button class="link" id="setupBtn">Set up biometric</button>
+<div class="pinPanel hidden" id="pinPanel">
+<label for="pinInput">Enter your PIN</label>
+<input id="pinInput" inputmode="numeric" autocomplete="off" maxlength="8" type="password" placeholder="••••">
+<button class="primary" id="pinUnlockBtn">Unlock with PIN</button>
+<button class="link" id="backBtn">Back to biometric</button>
+</div>
+<div class="message" id="message" role="status"></div>
+<p class="note">GitHub Pages compatible • HTTPS required</p>
+</section>
+<section class="card hidden" id="setupCard">
+<div class="icon">🛡️</div>
+<p class="eyebrow">FIRST-TIME SETUP</p>
+<h2>Enable biometric unlock</h2>
+<p class="sub">Your device will show its normal security prompt. Depending on the device, that can be fingerprint, face unlock, or the device screen lock.</p>
+<button class="primary" id="registerBtn">Set up Face / Fingerprint</button>
+<button class="secondary" id="setupPinBtn">Set up PIN fallback</button>
+<button class="link" id="cancelSetupBtn">Cancel</button>
+</section>
+<section class="card hidden" id="secretCard">
+<div class="success">✓</div>
+<p class="eyebrow">AUTHENTICATED</p>
+<h2>Welcome in 👋</h2>
+<p class="sub">The protected demo area is unlocked.</p>
+<div class="secretBox">🔒 Your private content goes here.</div>
+<button class="secondary" id="lockBtn">Lock again</button>
+</section>
 </main>
 <script>
-const $=id=>document.getElementById(id);
-const status=$('status'),registerBox=$('registerBox'),unlockBox=$('unlockBox'),secret=$('secret');
-const STORAGE_KEY='biometric-demo-credential-v2';
-
-function setStatus(text,type=''){status.textContent=text;status.className='status '+type}
-function randomBytes(n=32){const a=new Uint8Array(n);crypto.getRandomValues(a);return a}
-function toBase64Url(buffer){const bytes=new Uint8Array(buffer);let binary='';for(const b of bytes)binary+=String.fromCharCode(b);return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
-function fromBase64Url(value){value=value.replace(/-/g,'+').replace(/_/g,'/');while(value.length%4)value+='=';const binary=atob(value);return Uint8Array.from(binary,c=>c.charCodeAt(0))}
-function supported(){return window.isSecureContext&&'PublicKeyCredential'in window&&'credentials'in navigator}
-async function platformAvailable(){try{return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()}catch{return false}}
-
-async function registerBiometric(){
-  try{
-    $('registerBtn').disabled=true;
-    setStatus('Follow your phone prompt to verify with fingerprint, face, or screen lock…');
-    const credential=await navigator.credentials.create({publicKey:{
-      challenge:randomBytes(),
-      rp:{name:'Biometric Test',id:location.hostname},
-      user:{id:randomBytes(16),name:'demo-user',displayName:'Biometric Demo User'},
-      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
-      authenticatorSelection:{authenticatorAttachment:'platform',residentKey:'preferred',userVerification:'required'},
-      timeout:60000,
-      attestation:'none'
-    }});
-    if(!credential)throw new Error('No credential was returned.');
-    localStorage.setItem(STORAGE_KEY,toBase64Url(credential.rawId));
-    registerBox.classList.add('hidden');unlockBox.classList.remove('hidden');
-    setStatus('Biometric setup complete. You can now test unlocking.','ok');
-  }catch(error){
-    console.error(error);
-    const message=error.name==='NotAllowedError'?'The verification was cancelled or the device did not allow it.':error.name==='SecurityError'?'This site is not in a valid secure WebAuthn context. Use the GitHub Pages HTTPS URL.':error.message||'Biometric setup failed.';
-    setStatus(message,'bad');
-  }finally{$('registerBtn').disabled=false}
-}
-
+const $=id=>document.getElementById(id),KEY='biometric-demo-credential-v3',PINKEY='biometric-demo-pin-v1';
+const enc=new TextEncoder();
+function bytes(n=32){const a=new Uint8Array(n);crypto.getRandomValues(a);return a}
+function b64(b){let s='';for(const x of new Uint8Array(b))s+=String.fromCharCode(x);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function unb64(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';const x=atob(s);return Uint8Array.from(x,c=>c.charCodeAt(0))}
+function msg(t,c=''){const e=$('message');e.textContent=t;e.className='message '+c}
+function supported(){return isSecureContext&&'PublicKeyCredential'in window&&'credentials'in navigator}
+async function platform(){try{return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()}catch{return false}}
+function show(id){['lockCard','setupCard','secretCard'].forEach(x=>$(x).classList.toggle('hidden',x!==id))}
+async function register(){
+ try{$('registerBtn').disabled=true;msg('Follow your device prompt…');
+ const c=await navigator.credentials.create({publicKey:{challenge:bytes(),rp:{name:'Biometric Lock Demo',id:location.hostname},user:{id:bytes(16),name:'demo-user',displayName:'Demo User'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',residentKey:'preferred',userVerification:'required'},timeout:60000,attestation:'none'}});
+ if(!c)throw Error('No credential returned.');localStorage.setItem(KEY,b64(c.rawId));show('lockCard');$('setupBtn').textContent='Reset biometric';msg('Biometric is ready. 🔐','ok');
+ }catch(e){msg(e.name==='NotAllowedError'?'Setup was cancelled or timed out.':e.message||'Biometric setup failed.','bad')}finally{$('registerBtn').disabled=false}}
 async function unlock(){
-  try{
-    $('unlockBtn').disabled=true;
-    secret.classList.add('hidden');
-    setStatus('Verify your identity using the device prompt…');
-    const saved=localStorage.getItem(STORAGE_KEY);
-    if(!saved)throw new Error('No biometric credential is registered.');
-    const assertion=await navigator.credentials.get({publicKey:{
-      challenge:randomBytes(),
-      rpId:location.hostname,
-      allowCredentials:[{type:'public-key',id:fromBase64Url(saved)}],
-      userVerification:'required',
-      timeout:60000
-    }});
-    if(!assertion)throw new Error('No authentication response was returned.');
-    secret.classList.remove('hidden');
-    setStatus('Device verification successful. 🔓','ok');
-  }catch(error){
-    console.error(error);
-    const message=error.name==='NotAllowedError'?'Verification cancelled, timed out, or failed.':error.message||'Verification failed.';
-    setStatus(message,'bad');
-  }finally{$('unlockBtn').disabled=false}
-}
-
-$('registerBtn').onclick=registerBiometric;
-$('unlockBtn').onclick=unlock;
-$('resetBtn').onclick=()=>{localStorage.removeItem(STORAGE_KEY);secret.classList.add('hidden');unlockBox.classList.add('hidden');registerBox.classList.remove('hidden');setStatus('Reset complete. Set up biometric again.')};
-
-(async()=>{
-  if(!supported()){$('registerBtn').disabled=true;setStatus('WebAuthn is unavailable. Open this page through the HTTPS GitHub Pages URL in a supported browser.','bad');return}
-  const available=await platformAvailable();
-  if(!available){$('registerBtn').disabled=true;setStatus('This browser/device does not currently expose a built-in biometric authenticator.','bad');return}
-  if(localStorage.getItem(STORAGE_KEY)){registerBox.classList.add('hidden');unlockBox.classList.remove('hidden');setStatus('A biometric credential is already registered on this browser.','ok')}
-  else setStatus('Built-in device authentication is available. Ready to test.','ok');
-})();
+ try{$('unlockBtn').disabled=true;msg('Verify with your device…');const saved=localStorage.getItem(KEY);if(!saved)throw Error('No biometric is registered yet.');
+ const a=await navigator.credentials.get({publicKey:{challenge:bytes(),rpId:location.hostname,allowCredentials:[{type:'public-key',id:unb64(saved)}],userVerification:'required',timeout:60000}});if(!a)throw Error('No authentication response.');show('secretCard');
+ }catch(e){msg(e.name==='NotAllowedError'?'Verification cancelled, timed out, or failed.':e.message||'Verification failed.','bad')}finally{$('unlockBtn').disabled=false}}
+function openPin(){ $('pinPanel').classList.remove('hidden');$('pinInput').focus();msg(localStorage.getItem(PINKEY)?'Enter your saved PIN.':'No PIN is set yet. Use “Set up PIN fallback”.') }
+function setupPin(){const p=prompt('Create a 4–8 digit PIN for this demo:');if(!p||!/^[0-9]{4,8}$/.test(p)){msg('PIN must contain 4–8 digits.','bad');return}localStorage.setItem(PINKEY,p);msg('PIN fallback saved on this browser.','ok')}
+function pinUnlock(){const p=$('pinInput').value,saved=localStorage.getItem(PINKEY);if(!saved){msg('No PIN is set. Tap “Set up biometric” → “Set up PIN fallback”.','bad');return}if(p===saved){$('pinInput').value='';show('secretCard')}else{msg('Incorrect PIN.','bad');$('pinInput').value='';}}
+$('unlockBtn').onclick=unlock;$('pinBtn').onclick=openPin;$('pinUnlockBtn').onclick=pinUnlock;$('setupPinBtn').onclick=setupPin;$('setupBtn').onclick=()=>{show('setupCard');msg('')};$('backBtn').onclick=()=>{$('pinPanel').classList.add('hidden');msg('')};$('registerBtn').onclick=register;$('cancelSetupBtn').onclick=()=>show('lockCard');$('lockBtn').onclick=()=>{show('lockCard');msg('Locked again.','ok')};
+(async()=>{if(!supported()){ $('unlockBtn').disabled=true;msg('WebAuthn is unavailable here. Open the HTTPS GitHub Pages URL in a supported browser.','bad');return}if(!(await platform())){$('unlockBtn').disabled=true;msg('This device/browser does not expose a platform biometric authenticator. PIN fallback is still available.','bad')}else if(localStorage.getItem(KEY)){msg('Biometric is ready.','ok')}else{msg('Ready. Set up biometric unlock first.')}})();
 </script>
 </body>
 </html>
