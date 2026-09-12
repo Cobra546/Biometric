@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0b0d">
+  <title>Biometric Unlock Demo</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:#0b0b0d;color:#f5f5f5;font-family:system-ui,-apple-system,Segoe UI,sans-serif}main{width:min(430px,100%);padding:28px;border:1px solid #29292e;border-radius:28px;background:#151519;box-shadow:0 20px 70px #0008;text-align:center}h1{margin:0 0 8px;font-size:30px}p{color:#aaa;line-height:1.5}.icon{font-size:58px;margin:12px}.status{min-height:24px;margin:18px 0;color:#bbb}.ok{color:#7df29a}.bad{color:#ff8d8d}button{width:100%;border:0;border-radius:16px;padding:15px;margin-top:10px;font-size:16px;font-weight:700;cursor:pointer;background:#fff;color:#111}button.secondary{background:#24242a;color:#fff}button:disabled{opacity:.5;cursor:not-allowed}.hidden{display:none}.small{font-size:12px;color:#777;margin-top:18px}.panel{margin-top:22px;padding:18px;border-radius:18px;background:#1e1e24;text-align:left}.panel strong{display:block;margin-bottom:6px}</style>
+</head>
+<body>
+<main>
+  <div class="icon">🔐</div>
+  <h1>Biometric Unlock</h1>
+  <p>Test how your phone's fingerprint, face unlock, or device authentication can unlock a web page using WebAuthn.</p>
+
+  <div id="setup">
+    <button id="register">Set up biometric unlock</button>
+  </div>
+
+  <div id="unlock" class="hidden">
+    <button id="authenticate">👆 Unlock with fingerprint / face</button>
+    <button id="reset" class="secondary">Reset this demo</button>
+  </div>
+
+  <div id="secret" class="panel hidden">
+    <strong>✅ Unlocked!</strong>
+    <span>Your browser successfully returned a WebAuthn authentication response.</span>
+  </div>
+
+  <div id="status" class="status">Checking WebAuthn support…</div>
+  <div class="small">Demo only — client-side verification is not suitable for protecting real secrets.</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const status=$('status');
+const setup=$('setup'), unlock=$('unlock'), secret=$('secret');
+const KEY='biometric-demo-credential';
+
+function b64url(bytes){let s='';bytes=new Uint8Array(bytes);for(const b of bytes)s+=String.fromCharCode(b);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function randomBytes(n=32){const a=new Uint8Array(n);crypto.getRandomValues(a);return a}
+function setStatus(text,type=''){status.textContent=text;status.className='status '+type}
+function supported(){return window.isSecureContext && !!window.PublicKeyCredential && !!navigator.credentials}
+
+async function canUsePlatformAuthenticator(){
+  try{return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()}
+  catch{return false}
+}
+
+async function registerBiometric(){
+  try{
+    setStatus('Waiting for fingerprint / face / device verification…');
+    const userId=randomBytes(16);
+    const challenge=randomBytes(32);
+    const credential=await navigator.credentials.create({publicKey:{
+      challenge,
+      rp:{name:'Biometric Demo',id:location.hostname},
+      user:{id:userId,name:'demo-user',displayName:'Demo User'},
+      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'preferred'},
+      timeout:60000,
+      attestation:'none'
+    }});
+    if(!credential) throw new Error('No credential returned');
+    localStorage.setItem(KEY,b64url(credential.rawId));
+    setup.classList.add('hidden');unlock.classList.remove('hidden');
+    setStatus('Biometric unlock is ready on this browser.','ok');
+  }catch(e){
+    console.error(e);
+    setStatus(e.name==='NotAllowedError'?'Authentication was cancelled or unavailable.':e.message||'Could not register biometric.', 'bad');
+  }
+}
+
+async function authenticate(){
+  try{
+    const saved=localStorage.getItem(KEY);
+    if(!saved) return location.reload();
+    setStatus('Verify with your fingerprint / face / device authentication…');
+    const challenge=randomBytes(32);
+    const rawId=Uint8Array.from(atob(saved.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+    const assertion=await navigator.credentials.get({publicKey:{
+      challenge,
+      rpId:location.hostname,
+      allowCredentials:[{type:'public-key',id:rawId}],
+      userVerification:'required',
+      timeout:60000
+    }});
+    if(!assertion) throw new Error('No assertion returned');
+    secret.classList.remove('hidden');
+    setStatus('Verified by the device authenticator.','ok');
+  }catch(e){
+    console.error(e);
+    setStatus(e.name==='NotAllowedError'?'Verification cancelled or failed.':e.message||'Verification failed.','bad');
+  }
+}
+
+$('register').onclick=registerBiometric;
+$('authenticate').onclick=authenticate;
+$('reset').onclick=()=>{localStorage.removeItem(KEY);location.reload()};
+
+(async()=>{
+  if(!supported()){
+    setStatus('WebAuthn needs a supported browser and HTTPS.','bad');
+    $('register').disabled=true;return;
+  }
+  const platform=await canUsePlatformAuthenticator();
+  if(!platform) setStatus('WebAuthn works, but this device/browser may not offer a built-in biometric authenticator.','bad');
+  else setStatus('Built-in authenticator detected.');
+  if(localStorage.getItem(KEY)){setup.classList.add('hidden');unlock.classList.remove('hidden');}
+})();
+</script>
+</body>
+</html>
